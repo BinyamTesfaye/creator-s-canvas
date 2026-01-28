@@ -28,20 +28,26 @@ export function HeroSection() {
             className="space-y-6"
           >
             {/* Profile Image */}
-            {settings?.profile_image_url && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 shadow-large"
-              >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-primary/20 shadow-large bg-secondary"
+            >
+              {settings?.profile_image_url ? (
                 <img
                   src={settings.profile_image_url}
                   alt={settings.artist_name}
                   className="w-full h-full object-cover"
                 />
-              </motion.div>
-            )}
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
+                  <span className="font-display text-3xl md:text-4xl text-primary font-semibold">
+                    {settings?.artist_name?.charAt(0) || "A"}
+                  </span>
+                </div>
+              )}
+            </motion.div>
 
             {/* Name & Tagline */}
             <div className="space-y-3">
