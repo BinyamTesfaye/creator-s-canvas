@@ -31,7 +31,7 @@ serve(async (req) => {
 
     console.log("Processing order:", orderId);
 
-    // Get order details
+    // Get order details with product info
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .select("*")
@@ -44,6 +44,23 @@ serve(async (req) => {
         JSON.stringify({ error: "Order not found" }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Get product details if product_id exists
+    let productImage: string | null = null;
+    let productDetails: any = null;
+    
+    if (order.product_id) {
+      const { data: product } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", order.product_id)
+        .single();
+      
+      if (product) {
+        productDetails = product;
+        productImage = product.image_url;
+      }
     }
 
     // Get site settings for Telegram credentials
@@ -65,47 +82,74 @@ serve(async (req) => {
     if (!telegram_bot_token || !telegram_chat_id) {
       console.log("Telegram not configured, skipping notification");
       return new Response(
-        JSON.stringify({ message: "Telegram not configured" }),
+        JSON.stringify({ message: "Telegram not configured", configured: false }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Format message
-    const message = `🛒 *New Order Received!*
+    // Format detailed message
+    const orderDate = new Date(order.created_at).toLocaleString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-📦 *Product:* ${order.product_name}
-🔢 *Quantity:* ${order.quantity}
-💰 *Total:* $${order.total_price?.toFixed(2) || "0.00"}
+    const message = `🛒 *NEW ORDER RECEIVED!*
+━━━━━━━━━━━━━━━━━━━━
 
-👤 *Customer:* ${order.customer_name}
-📞 *Contact:* ${order.customer_contact}
-${order.message ? `\n💬 *Message:* ${order.message}` : ""}
+📦 *Product Details:*
+• Name: ${order.product_name}
+• Quantity: ${order.quantity}
+• Unit Price: $${productDetails?.price?.toFixed(2) || "N/A"}
+• Total: *$${order.total_price?.toFixed(2) || "0.00"}*
+${productDetails?.category ? `• Category: ${productDetails.category}` : ""}
+${productDetails?.size ? `• Size: ${productDetails.size}` : ""}
+${productDetails?.paper_type ? `• Paper: ${productDetails.paper_type}` : ""}
 
-📅 *Date:* ${new Date(order.created_at).toLocaleString()}`;
+━━━━━━━━━━━━━━━━━━━━
+
+👤 *Customer Information:*
+• Name: ${order.customer_name}
+• Contact: ${order.customer_contact}
+${order.message ? `\n💬 *Customer Message:*\n"${order.message}"` : ""}
+
+━━━━━━━━━━━━━━━━━━━━
+
+📅 *Order Date:* ${orderDate}
+🔖 *Order ID:* \`${order.id.slice(0, 8)}...\`
+📊 *Status:* ${order.status?.toUpperCase() || "PENDING"}`;
 
     console.log("Sending Telegram message...");
 
-    // Send to Telegram
-    const telegramUrl = `https://api.telegram.org/bot${telegram_bot_token}/sendMessage`;
-    const telegramResponse = await fetch(telegramUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: telegram_chat_id,
-        text: message,
-        parse_mode: "Markdown",
-      }),
-    });
+    // If product has an image, send it with the caption
+    if (productImage) {
+      // Send photo with caption
+      const photoUrl = `https://api.telegram.org/bot${telegram_bot_token}/sendPhoto`;
+      const photoResponse = await fetch(photoUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: telegram_chat_id,
+          photo: productImage,
+          caption: message,
+          parse_mode: "Markdown",
+        }),
+      });
 
-    const telegramResult = await telegramResponse.json();
-    console.log("Telegram response:", telegramResult);
+      const photoResult = await photoResponse.json();
+      console.log("Telegram photo response:", photoResult);
 
-    if (!telegramResponse.ok) {
-      console.error("Telegram API error:", telegramResult);
-      return new Response(
-        JSON.stringify({ error: "Failed to send Telegram message", details: telegramResult }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      if (!photoResponse.ok) {
+        // If photo fails, fall back to text message
+        console.log("Photo send failed, falling back to text message");
+        await sendTextMessage(telegram_bot_token, telegram_chat_id, message);
+      }
+    } else {
+      // Send text message only
+      await sendTextMessage(telegram_bot_token, telegram_chat_id, message);
     }
 
     // Update order to mark Telegram as sent
@@ -129,3 +173,25 @@ ${order.message ? `\n💬 *Message:* ${order.message}` : ""}
     );
   }
 });
+
+async function sendTextMessage(botToken: string, chatId: string, message: string) {
+  const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+  const response = await fetch(telegramUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: message,
+      parse_mode: "Markdown",
+    }),
+  });
+
+  const result = await response.json();
+  console.log("Telegram text response:", result);
+
+  if (!response.ok) {
+    throw new Error(`Telegram API error: ${JSON.stringify(result)}`);
+  }
+
+  return result;
+}
