@@ -62,7 +62,7 @@ const AdminLayout = () => {
         {/* Logo */}
         <div className="p-6 border-b border-border">
           <Link to="/" className="flex items-center gap-2">
-            <span className="font-display text-xl font-semibold">Artisan</span>
+            <span className="font-display text-xl font-semibold">Dagisho</span>
             <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
               Admin
             </span>
