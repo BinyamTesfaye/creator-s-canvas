@@ -4,6 +4,7 @@ import { Menu, X, ShoppingBag, Image, Home, Settings } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navLinks = [
   { name: "Home", path: "/", icon: Home },
@@ -54,6 +55,7 @@ export function Navbar() {
                 </Button>
               </Link>
             )}
+            <ThemeToggle />
           </div>
 
           {/* Mobile Menu Button */}
