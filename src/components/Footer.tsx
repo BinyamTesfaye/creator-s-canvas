@@ -10,7 +10,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {/* Brand */}
           <div className="space-y-4">
-            <h3 className="font-display text-xl font-semibold">Artisan</h3>
+            <h3 className="font-display text-xl font-semibold">Dagisho</h3>
             <p className="text-muted-foreground text-sm max-w-xs">
               Handcrafted with love. Each piece tells a unique story.
             </p>
@@ -67,7 +67,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © {currentYear} Artisan. All rights reserved.
+            © {currentYear} Dagisho. All rights reserved.
           </p>
           <Link
             to="/admin/login"
