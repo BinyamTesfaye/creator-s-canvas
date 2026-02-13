@@ -9,6 +9,7 @@ import {
   Settings,
   LogOut,
   Home,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,6 +20,7 @@ const sidebarLinks = [
   { name: "Products", path: "/admin/products", icon: Package },
   { name: "Portfolio", path: "/admin/portfolio", icon: Image },
   { name: "Orders", path: "/admin/orders", icon: ShoppingCart },
+  { name: "Journal", path: "/admin/journal", icon: BookOpen },
   { name: "Settings", path: "/admin/settings", icon: Settings },
 ];
 
