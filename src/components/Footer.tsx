@@ -31,6 +31,9 @@ export function Footer() {
               <Link to="/shop" className="text-sm text-foreground hover:text-primary transition-colors">
                 Shop
               </Link>
+              <Link to="/journal" className="text-sm text-foreground hover:text-primary transition-colors">
+                Journal
+              </Link>
             </nav>
           </div>
 

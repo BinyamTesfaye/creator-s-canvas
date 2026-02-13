@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Menu, X, ShoppingBag, Image, Home, Settings } from "lucide-react";
+import { Menu, X, ShoppingBag, Image, Home, Settings, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,6 +10,7 @@ const navLinks = [
   { name: "Home", path: "/", icon: Home },
   { name: "Portfolio", path: "/portfolio", icon: Image },
   { name: "Shop", path: "/shop", icon: ShoppingBag },
+  { name: "Journal", path: "/journal", icon: BookOpen },
 ];
 
 export function Navbar() {
