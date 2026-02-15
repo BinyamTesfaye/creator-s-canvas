@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, Eye, EyeOff, Image as ImageIcon } from "lucide-react";
+import { TagInput } from "@/components/TagInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +31,7 @@ const emptyPost = {
   image_url: "",
   is_published: false,
   published_at: null as string | null,
+  tags: [] as string[],
 };
 
 const AdminJournal = () => {
@@ -58,6 +60,7 @@ const AdminJournal = () => {
       image_url: post.image_url || "",
       is_published: post.is_published,
       published_at: post.published_at,
+      tags: post.tags || [],
     });
     setIsOpen(true);
   };
@@ -95,6 +98,7 @@ const AdminJournal = () => {
       excerpt: form.excerpt || null,
       image_url: form.image_url || null,
       is_published: form.is_published,
+      tags: form.tags,
       published_at: form.is_published
         ? form.published_at || new Date().toISOString()
         : null,
@@ -243,6 +247,14 @@ const AdminJournal = () => {
                 onCheckedChange={(checked) => setForm((f) => ({ ...f, is_published: checked }))}
               />
               <Label>Publish immediately</Label>
+            </div>
+
+            <div>
+              <Label>Tags</Label>
+              <TagInput
+                tags={form.tags}
+                onChange={(tags) => setForm((f) => ({ ...f, tags }))}
+              />
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
