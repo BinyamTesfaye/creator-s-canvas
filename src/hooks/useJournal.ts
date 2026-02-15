@@ -9,6 +9,7 @@ export interface JournalPost {
   image_url: string | null;
   is_published: boolean;
   published_at: string | null;
+  tags: string[];
   created_at: string;
   updated_at: string;
 }

@@ -23,6 +23,7 @@ export type Database = {
           image_url: string | null
           is_published: boolean
           published_at: string | null
+          tags: string[] | null
           title: string
           updated_at: string
         }
@@ -34,6 +35,7 @@ export type Database = {
           image_url?: string | null
           is_published?: boolean
           published_at?: string | null
+          tags?: string[] | null
           title: string
           updated_at?: string
         }
@@ -45,6 +47,7 @@ export type Database = {
           image_url?: string | null
           is_published?: boolean
           published_at?: string | null
+          tags?: string[] | null
           title?: string
           updated_at?: string
         }

@@ -1,13 +1,29 @@
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Calendar, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { Badge } from "@/components/ui/badge";
 import { useJournalPosts } from "@/hooks/useJournal";
 
 const Journal = () => {
   const { data: posts, isLoading } = useJournalPosts();
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+
+  const allTags = useMemo(() => {
+    if (!posts) return [];
+    const tagSet = new Set<string>();
+    posts.forEach((p) => p.tags?.forEach((t) => tagSet.add(t)));
+    return Array.from(tagSet).sort();
+  }, [posts]);
+
+  const filteredPosts = useMemo(() => {
+    if (!posts) return [];
+    if (!activeTag) return posts;
+    return posts.filter((p) => p.tags?.includes(activeTag));
+  }, [posts, activeTag]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -15,7 +31,6 @@ const Journal = () => {
 
       <main className="pt-24 pb-16">
         <div className="artistic-container">
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -27,7 +42,32 @@ const Journal = () => {
             </p>
           </motion.div>
 
-          {/* Posts Grid */}
+          {allTags.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-wrap justify-center gap-2 mb-10"
+            >
+              <Badge
+                variant={activeTag === null ? "default" : "outline"}
+                className="cursor-pointer"
+                onClick={() => setActiveTag(null)}
+              >
+                All
+              </Badge>
+              {allTags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant={activeTag === tag ? "default" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => setActiveTag(tag)}
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </motion.div>
+          )}
+
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3].map((i) => (
@@ -38,13 +78,15 @@ const Journal = () => {
                 </div>
               ))}
             </div>
-          ) : !posts?.length ? (
+          ) : !filteredPosts.length ? (
             <div className="text-center py-20 text-muted-foreground">
-              <p className="text-lg">No journal entries yet. Check back soon!</p>
+              <p className="text-lg">
+                {activeTag ? `No posts tagged "${activeTag}".` : "No journal entries yet. Check back soon!"}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {posts.map((post, i) => (
+              {filteredPosts.map((post, i) => (
                 <motion.div
                   key={post.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -78,6 +120,15 @@ const Journal = () => {
                         <p className="text-sm text-muted-foreground line-clamp-2">
                           {post.excerpt}
                         </p>
+                      )}
+                      {post.tags?.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {post.tags.map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
                       )}
                       <span className="inline-flex items-center gap-1 text-sm text-primary font-medium">
                         Read more <ArrowRight className="w-3.5 h-3.5" />
