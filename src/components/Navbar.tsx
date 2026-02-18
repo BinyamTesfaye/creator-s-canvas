@@ -16,7 +16,7 @@ const navLinks = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
 
   return (
     <motion.nav
@@ -48,7 +48,7 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
-            {isAuthenticated && (
+            {isAuthenticated && isAdmin && (
               <Link to="/admin">
                 <Button variant="outline" size="sm" className="gap-2">
                   <Settings className="w-4 h-4" />
@@ -93,7 +93,7 @@ export function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              {isAuthenticated && (
+              {isAuthenticated && isAdmin && (
                 <Link
                   to="/admin"
                   onClick={() => setIsOpen(false)}
