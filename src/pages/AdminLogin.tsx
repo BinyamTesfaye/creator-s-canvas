@@ -19,11 +19,12 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -69,35 +70,31 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await signIn(result.data.email, result.data.password);
-      if (error) {
-        if (error.message.includes("Invalid login credentials")) {
-          toast.error("Invalid email or password.");
-        } else {
-          toast.error(error.message);
-        }
-        return;
-      }
-
-      // Check if user has admin role
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .eq("role", "admin")
-          .maybeSingle();
-
-        if (!roleData) {
-          await supabase.auth.signOut();
-          toast.error("You don't have admin access.");
+      if (isSignUp) {
+        const { error } = await signUp(result.data.email, result.data.password);
+        if (error) {
+          if (error.message.includes("already registered")) {
+            toast.error("This email is already registered. Please sign in.");
+          } else {
+            toast.error(error.message);
+          }
           return;
         }
+        toast.success("Account created! You can now sign in.");
+        setIsSignUp(false);
+      } else {
+        const { error } = await signIn(result.data.email, result.data.password);
+        if (error) {
+          if (error.message.includes("Invalid login credentials")) {
+            toast.error("Invalid email or password.");
+          } else {
+            toast.error(error.message);
+          }
+          return;
+        }
+        toast.success("Welcome back!");
+        navigate("/admin");
       }
-
-      toast.success("Welcome back!");
-      navigate("/admin");
     } catch (error) {
       toast.error("An unexpected error occurred.");
     } finally {
@@ -119,7 +116,9 @@ const AdminLogin = () => {
                 <Lock className="w-8 h-8 text-primary" />
               </div>
               <h1 className="font-display text-2xl font-semibold">Reset Password</h1>
-              <p className="text-muted-foreground mt-2">Enter your email to receive a reset link</p>
+              <p className="text-muted-foreground mt-2">
+                Enter your email to receive a reset link
+              </p>
             </div>
             <form onSubmit={handleForgotPassword} className="space-y-4">
               <div className="space-y-2">
@@ -163,8 +162,12 @@ const AdminLogin = () => {
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Lock className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="font-display text-2xl font-semibold">Admin Access</h1>
-            <p className="text-muted-foreground mt-2">Sign in to manage your website</p>
+            <h1 className="font-display text-2xl font-semibold">
+              {isSignUp ? "Create Account" : "Admin Access"}
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              {isSignUp ? "Create your admin account" : "Sign in to manage your website"}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -195,17 +198,32 @@ const AdminLogin = () => {
             </div>
 
             <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In"}
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : isSignUp ? (
+                "Create Account"
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
+            {!isSignUp && (
+              <button
+                type="button"
+                onClick={() => setIsForgotPassword(true)}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors block mx-auto"
+              >
+                Forgot password?
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => setIsForgotPassword(true)}
+              onClick={() => setIsSignUp(!isSignUp)}
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
             >
-              Forgot password?
+              {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
             </button>
           </div>
         </div>

@@ -25,15 +25,15 @@ const sidebarLinks = [
 ];
 
 const AdminLayout = () => {
-  const { isAuthenticated, isAdmin, loading, signOut } = useAuth();
+  const { isAuthenticated, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (!loading && (!isAuthenticated || !isAdmin)) {
+    if (!loading && !isAuthenticated) {
       navigate("/admin/login");
     }
-  }, [isAuthenticated, isAdmin, loading, navigate]);
+  }, [isAuthenticated, loading, navigate]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -49,7 +49,7 @@ const AdminLayout = () => {
     );
   }
 
-  if (!isAuthenticated || !isAdmin) {
+  if (!isAuthenticated) {
     return null;
   }
 
