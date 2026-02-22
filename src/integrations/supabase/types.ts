@@ -270,7 +270,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      site_settings_public: {
+        Row: {
+          about_text: string | null
+          artist_name: string | null
+          bio: string | null
+          created_at: string | null
+          id: string | null
+          logo_url: string | null
+          profile_image_url: string | null
+          tagline: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          about_text?: string | null
+          artist_name?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id?: string | null
+          logo_url?: string | null
+          profile_image_url?: string | null
+          tagline?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          about_text?: string | null
+          artist_name?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id?: string | null
+          logo_url?: string | null
+          profile_image_url?: string | null
+          tagline?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {

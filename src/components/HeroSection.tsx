@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { usePublicSiteSettings } from "@/hooks/useSiteSettings";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useMemo } from "react";
 
@@ -81,7 +81,7 @@ function FloatingDoodles() {
 }
 
 export function HeroSection() {
-  const { data: settings, isLoading } = useSiteSettings();
+  const { data: settings, isLoading } = usePublicSiteSettings();
 
   return (
     <section className="relative min-h-screen flex items-center pt-20">
