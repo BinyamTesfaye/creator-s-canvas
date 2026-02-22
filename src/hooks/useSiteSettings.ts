@@ -15,6 +15,35 @@ export interface SiteSettings {
   updated_at: string;
 }
 
+export interface PublicSiteSettings {
+  id: string;
+  profile_image_url: string | null;
+  logo_url: string | null;
+  artist_name: string | null;
+  tagline: string | null;
+  bio: string | null;
+  about_text: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Public view - excludes telegram credentials, accessible to everyone
+export function usePublicSiteSettings() {
+  return useQuery({
+    queryKey: ["site-settings-public"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings_public" as any)
+        .select("*")
+        .single();
+      
+      if (error) throw error;
+      return data as unknown as PublicSiteSettings;
+    },
+  });
+}
+
+// Admin only - full access including telegram credentials
 export function useSiteSettings() {
   return useQuery({
     queryKey: ["site-settings"],
@@ -46,6 +75,7 @@ export function useUpdateSiteSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["site-settings-public"] });
     },
   });
 }

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Heart, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { usePublicSiteSettings } from "@/hooks/useSiteSettings";
 
 const features = [
   {
@@ -23,7 +23,7 @@ const features = [
 ];
 
 export function AboutSection() {
-  const { data: settings } = useSiteSettings();
+  const { data: settings } = usePublicSiteSettings();
 
   return (
     <section className="py-20 md:py-32 bg-secondary/30">
