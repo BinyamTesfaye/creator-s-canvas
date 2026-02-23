@@ -78,9 +78,10 @@ export function OrderModal({ product, isOpen, onClose }: OrderModalProps) {
       toast.success("Order placed successfully! We'll be in touch soon.");
       onClose();
       resetForm();
-    } catch (error) {
-      console.error("Order creation failed:", error);
-      toast.error("Failed to place order. Please try again.");
+    } catch (error: any) {
+  console.error("Order creation failed:", error);
+  toast.error(error?.message || "Failed to place order. Please try again.");
+
     } finally {
       setIsSending(false);
     }
